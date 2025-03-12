@@ -1,0 +1,25 @@
+<html>
+    <head>
+<style>
+.thumbnail {
+    width: 200px;
+    height: 200px;
+}
+</style>
+    </head>
+    <body>
+        {% include "menu.j2" %}
+        <h1>Library</h1>
+        <ul>
+            {% for f in files %}
+                <li>
+                    <a class="link" href="/play/{{ f.id }}">
+                        <div class="title">{{ f.title }}</div>
+                        <div><img class="thumbnail" src="{{ f.thumbnail }}"></div>
+                        </p>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+</body>
+</html>

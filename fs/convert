@@ -1,0 +1,12 @@
+#!/bin/bash
+
+youtube_id="$1"
+
+echo "Converting $youtube_id"
+
+yt-dlp --audio-format flac --extract-audio "$youtube_id" -o "/tmp/$youtube_id.flac" && \
+    demucs --clip-mode rescale --jobs $(nproc --all) --flac "/tmp/$youtube_id.flac" && \
+    mv "separated/htdemucs/$youtube_id" "static/music/$youtube_id"
+
+[ -e "/tmp/$youtube_id.flac" ] && rm "/tmp/$youtube_id.flac"
+[ -d "separated/htdemucs/$youtube_id" ] && rm -r -- "separated/htdemucs/$youtube_id"

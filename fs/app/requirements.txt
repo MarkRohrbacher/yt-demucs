@@ -1,0 +1,6 @@
+connexion ~= 2.14.0
+connexion[swagger-ui] ~= 2.14.0
+flask ~= 2.0.0
+werkzeug ~= 2.0.3
+eventlet ~= 0.39
+filecache ~= 0.81
