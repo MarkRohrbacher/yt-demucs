@@ -1,30 +1,26 @@
 <!doctype html>
 <html data-bs-theme="dark">
     <head>
-<style>
-.fullscreen {
-    width: 100vw;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
-}
-.convert-screen {
-    opacity: 80%;
-    z-index: 9999;
-}
-
+        <style>
 .convert:hover {
     color: var(--bs-danger-text-emphasis);
     background-color: var(--bs-secondary-bg);
-}
-</style>
+};
+        </style>
     </head>
     <body>
-        <div id="convert-screen" class="fullscreen convert-screen" style="display: none">
-            <h1>Please wait until process is completed</h1>
-            <pre id="convert-output">
-            </pre>
+        <div class="modal fade" id="conversion-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Please wait</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>Please wait until process is completed.</p>
+                        <pre id="convert-output"></pre>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <main class="main">
@@ -87,8 +83,9 @@
                             </div>
                             </div>
                         </div>
-                        <div class="col-1 d-flex align-items-center justify-content-center convert" data-id="{{ f.id }}">
-                            <h3><i class="bi-cloud-plus-fill" data-id="{{ f.id }}"></i></h3>
+                        <div class="col-1 d-flex align-items-center justify-content-center convert"
+                             data-bs-toggle="modal" data-bs-target="#conversion-modal" data-id="{{ f.id }}">
+                            <h3><i class="bi-cloud-plus-fill"></i></h3>
                         </div>
                     </div>
                 {% endfor %}
@@ -119,7 +116,6 @@
             const id = this.getAttribute("data-id");
             let xhr = new XMLHttpRequest();
             xhr.open("GET", "/convert/" + id, true);
-            document.getElementById('convert-screen').style.display = "block";
             xhr.onprogress = () => {
                 const lines = xhr.responseText.trim().split("\n");
                 const last_line = lines[lines.length - 1];
