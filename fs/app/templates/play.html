@@ -1,4 +1,5 @@
-<html>
+<!doctype html>
+<html data-bs-theme="dark">
     <head>
 <style>
 .thumbnail {
@@ -8,41 +9,94 @@
 </style>
     </head>
     <body>
-        {% include "menu.j2" %}
-        <h1>{{ file.title }}</h1>
-        <div>
-            <img class="thumbnail" src="{{ file.thumbnail }}">
-        </div>
-        <audio preload="auto" id="bass" class="master track">
-            <source src="data:audio/flac;base64,{{ data.bass }}" type="audio/flac"></source>
-        </audio>
-        <input type="range" value="100" max="100" min="0" id="bass_volume"> Bass
-        <br/>
-        <audio preload="auto" id="drums" class="slave track">
-            <source src="data:audio/flac;base64,{{ data.drums }}" type="audio/flac"></source>
-        </audio>
-        <input type="range" value="100" max="100" min="0" id="drums_volume"> Drums
-        <br/>
-        <audio preload="auto" id="vocals" class="slave track">
-            <source src="data:audio/flac;base64,{{ data.vocals }}" type="audio/flac"></source>
-        </audio>
-        <input type="range" value="100" max="100" min="0" id="vocals_volume"> Vocals
-        <br/>
-        <audio preload="auto" id="other" class="slave track">
-            <source src="data:audio/flac;base64,{{ data.other }}" type="audio/flac"></source>
-        </audio>
-        <input type="range" value="100" max="100" min="0" id="other_volume"> Other
-        <br/>
+        <main class="main">
+            <div class="container bg-body-tertiary" data-layout="container">
+                <div class="row text-center">
+                    <h1>{{ file.title }}</h1>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 col-sm-12 text-center pb-3">
+                        <img src="{{ file.thumbnail }}" style="width: 100%; height: 100%">
+                        <h4 class="text-secondary">{{ file.uploader }}</h4>
+                    </div>
+                    <div class="col-lg-6 col-sm-12 pt-3">
+                        <div class="row mb-3">
+                            <label for="bass_volume" class="col-2 col-form-label">Bass</label>
+                            <div class="col-10">
+                                <input class="form-range" type="range" value="100" max="100" min="0" id="bass_volume">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="drums_volume" class="col-2 col-form-label">Drums</label>
+                            <div class="col-10">
+                                <input class="form-range" type="range" value="100" max="100" min="0" id="drums_volume">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="vocals_volume" class="col-2 col-form-label">Vocals</label>
+                            <div class="col-10">
+                                <input class="form-range" type="range" value="100" max="100" min="0" id="vocals_volume">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="other_volume" class="col-2 col-form-label">Other</label>
+                            <div class="col-10">
+                                <input class="form-range" type="range" value="100" max="100" min="0" id="other_volume">
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row mb-3">
+                            <div class="col-2">
+                                <a href="#" class="btn btn-secondary" id="play">
+                                    <i class="bi bi-play"></i>
+                                </a>
+                            </div>
+                            <div class="col-2">
+                                <div id="position_string">0:00</div>
+                            </div>
+                            <div class="col">
+                                <input class="form-range" type="range" value="0" max="0" min="0" id="position">
+                            </div>
+                            <div class="col-2">
+                                <span id="duration_string">0:00</span>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-2">
+                                Speed
+                            </div>
+                            <div class="col btn-group">
+                                <input type="radio" class="btn-check" name="speed" id="speed50" value=".5">
+                                <label class="btn btn-outline-secondary" for="speed50">50 %</label>
+                                <input type="radio" class="btn-check" name="speed" id="speed60" value=".6">
+                                <label class="btn btn-outline-secondary" for="speed60">60 %</label>
+                                <input type="radio" class="btn-check" name="speed" id="speed70" value=".7">
+                                <label class="btn btn-outline-secondary" for="speed70">70 %</label>
+                                <input type="radio" class="btn-check" name="speed" id="speed80" value=".8">
+                                <label class="btn btn-outline-secondary" for="speed80">80 %</label>
+                                <input type="radio" class="btn-check" name="speed" id="speed90" value=".9">
+                                <label class="btn btn-outline-secondary" for="speed90">90 %</label>
+                                <input type="radio" class="btn-check" name="speed" id="speed100" value="1" checked>
+                                <label class="btn btn-outline-secondary" for="speed100">Original</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
 
-        <input type="button" id="play" value="Play">
-        <input type="range" value="0" id="position">
-        <fieldset>
-        <input type="radio" name="speed" value=".5">50%
-        <input type="radio" name="speed" value=".75">75%
-        <input type="radio" name="speed" value="1" checked>Original
-        <input type="radio" name="speed" value="1.5">150%
-        <input type="radio" name="speed" value="2">200%
-        </fieldset>
+        <audio id="bass" class="master track">
+            <source src="/static/music/{{ file.id }}/bass.flac" type="audio/flac"></source>
+        </audio>
+        <audio id="drums" class="slave track">
+            <source src="/static/music/{{ file.id }}/drums.flac" type="audio/flac"></source>
+        </audio>
+        <audio id="vocals" class="slave track">
+            <source src="/static/music/{{ file.id }}/vocals.flac" type="audio/flac"></source>
+        </audio>
+        <audio id="other" class="slave track">
+            <source src="/static/music/{{ file.id }}/other.flac" type="audio/flac"></source>
+        </audio>
 
         <script>
             const playpause = document.getElementById('play');
@@ -51,14 +105,24 @@
             const master = document.getElementsByClassName('master')[0];
             const slaves = document.getElementsByClassName('slave');
             const all = document.getElementsByClassName('track');
+            const positionElement = document.getElementById('position_string');
+            const durationElement = document.getElementById('duration_string');
+
+            function secondsToTimeString(num) {
+                const minutes = Math.floor(num / 60);
+                const seconds = Math.floor(num % 60);
+                function m2(num) {
+                    return (num < 10 ? "0" : "") + num;
+                }
+                return "" + minutes + ":" + m2(seconds);
+            }
 
             function connectVolume(name) {
                 const element = document.getElementById(name);
                 const volume = document.getElementById(name + "_volume");
 
-                volume.addEventListener("change", function() {
-                    element.volume = this.value / 100.0;
-                });
+                volume.addEventListener("change", function() { element.volume = this.value / 100.0; });
+                volume.addEventListener("input", function() { element.volume = this.value / 100.0; });
             }
 
             connectVolume('bass');
@@ -66,50 +130,30 @@
             connectVolume('vocals');
             connectVolume('other');
 
-            function syncSlaveTime() {
-                const time = master.currentTime;
-                const speed = master.playbackRate;
-                position.value = time;
-                console.debug("Sync time to " + position.value);
-                for (let e of slaves) {
-                    e.playbackRate = speed;
-                    e.currentTime = time;
-                }
-            }
-
             playpause.addEventListener("click", function() {
                 if (master.paused) {
                     if (master.ended) {
                         master.currentTime = 0;
                     }
-                    syncSlaveTime();
-                    playpause.value = "Pause";
+                    playpause.innerHTML = '<i class="bi bi-pause"></i>';
                     master.play();
                 }
                 else {
-                    playpause.value = "Play";
+                    playpause.innerHTML = '<i class="bi bi-play"></i>';
                     master.pause();
                 }
             });
 
-            function pauseAndPlay() {
-                if (master.paused) {
-                    return;
-                }
-                let remaining = slaves.length;
+            master.addEventListener("seeking", function() {
                 for (let e of slaves) {
-                    e.addEventListener("paused", { "once": true });
-                    if (--remaining == 0) {
-                        syncSlaveTime();
-                        setTimeout(function() { master.play(); }, 0);
-                    }
+                    e.currentTime = this.currentTime;
                 }
-                master.pause();
-            }
-
-            master.addEventListener("seeking", syncSlaveTime);
-            master.addEventListener("seeked", syncSlaveTime);
-
+            });
+            master.addEventListener("seeked", function() {
+                for (let e of slaves) {
+                    e.currentTime = this.currentTime;
+                }
+            });
             master.addEventListener("play", function() {
                 for (let e of slaves) {
                     e.play();
@@ -121,29 +165,61 @@
                 }
             });
 
+            let positionDragging = false;
+            position.addEventListener("mousedown", function() { positionDragging = true; });
+            position.addEventListener("mouseup", function() { positionDragging = false; });
+
             master.addEventListener("timeupdate", function() {
-                console.debug("timeupdate " + this.currentTime);
-                position.value = this.currentTime;
+                const time = this.currentTime;
+                for (let e of slaves) {
+                    const diff = e.currentTime - time;
+                    if (Math.abs(diff) < .01) {
+                        if (e.playbackRate != this.playbackRate) {
+                            console.debug(e.id + " soft sync done", time, diff);
+                            e.playbackRate = this.playbackRate;
+                        }
+                    } else if (Math.abs(diff) > .2) {
+                        console.debug(e.id + " hard sync", time, diff);
+                        e.playbackRate = this.playbackRate;
+                        e.currentTime = this.currentTime;
+                    } else {
+                        if (diff > 0) {
+                            e.playbackRate = this.playbackRate * .98;
+                            console.debug(e.id + " soft sync (slow down)", time, diff);
+                        } else {
+                            e.playbackRate = this.playbackRate * 1.02;
+                            console.debug(e.id + " soft sync (speed up)", time, diff);
+                        }
+                    }
+                }
+                if (!positionDragging) {
+                    position.value = Math.floor(this.currentTime);
+                }
+                positionElement.innerText = secondsToTimeString(this.currentTime);
             });
 
-            master.addEventListener("ended", function() {
-                playpause.value = "Play";
-            });
+            master.addEventListener("ended", function() { playpause.innerHTML = '<i class="bi bi-play"></i>'; });
 
             master.addEventListener("canplay", function() {
                 position.setAttribute("max", this.duration);
+                durationElement.innerText = secondsToTimeString(this.duration);
             });
+
             position.addEventListener("change", function() {
                 master.currentTime = this.value;
-                syncSlaveTime();
             });
             for (let s of speed) {
                 s.addEventListener("click", function() {
-                    console.debug("click", this.value);
                     master.playbackRate = this.value;
-                    pauseAndPlay();
+                    for (let e of slaves) {
+                        e.playbackRate = this.value;
+                    }
                 });
             }
         </script>
-    </body>
+</body>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="/static/css/default.css" rel="stylesheet">
 </html>

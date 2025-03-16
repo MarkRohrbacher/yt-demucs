@@ -27,7 +27,16 @@ def _cached_search_youtube(q):
 
 def get_meta(youtube_id):
     s = _cached_get_meta(youtube_id)
-    return json.loads(_cached_get_meta(youtube_id))
+    res = json.loads(_cached_get_meta(youtube_id))
+    res['fragments'] = None
+    res['formats'] = None
+    res['thumbnails'] = None
+    res['automatic_captions'] = None
+    res['subtitles'] = None
+    res['heatmap'] = None
+    res['requested_formats'] = None
+    print(json.dumps(res))
+    return res
 
 
 def search_youtube(q):
@@ -49,24 +58,11 @@ def mainpage(path):
     return render_template("library.html", files=files)
 
 
-def create_data(filename):
-    with open(filename, "rb") as f:
-        return base64.b64encode(f.read()).decode("ascii")
-
-
-
 @app.route("/play/<youtube_id>")
 def play(youtube_id):
     try:
         meta = get_meta(youtube_id)
-        data = {
-                'bass': create_data(f"static/music/{youtube_id}/bass.flac"),
-                'drums': create_data(f"static/music/{youtube_id}/drums.flac"),
-                'vocals': create_data(f"static/music/{youtube_id}/vocals.flac"),
-                'other': create_data(f"static/music/{youtube_id}/other.flac"),
-                }
-
-        return render_template("play.html", file=meta, data=data)
+        return render_template("play.html", file=meta)
     except Exception as e:
         print(f"Got Exception: {e}")
         return "File not found", 404
@@ -98,6 +94,7 @@ def preview(youtube_id):
 
     return Response(generate(), mimetype='audio/x-flac')
 
+
 @app.route("/convert/<youtube_id>")
 def convert(youtube_id):
     def generate():
@@ -114,12 +111,6 @@ def convert(youtube_id):
         yield "Finished."
 
     return Response(generate(), mimetype='text/plain')
-
-
-@app.route("/static/music/<folder>/<filename>")
-def get_audio_file(folder, filename):
-    print("GET_AUDIO")
-    return send_from_directory(f"static/music/{folder}", filename, conditional=False)
 
 
 if __name__ == "__main__":
