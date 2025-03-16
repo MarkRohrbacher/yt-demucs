@@ -23,4 +23,6 @@ RUN pip install -r requirements.txt && \
 
 COPY fs /
 
+VOLUME /app/static/music
+
 CMD [ "python3", "-u", "-m", "flask", "run", "--port", "8080", "--host", "0.0.0.0" ]
