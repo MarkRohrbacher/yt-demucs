@@ -28,6 +28,7 @@ def _cached_search_youtube(q):
 def get_meta(youtube_id):
     s = _cached_get_meta(youtube_id)
     res = json.loads(_cached_get_meta(youtube_id))
+    # remove unneeded slack
     res['fragments'] = None
     res['formats'] = None
     res['thumbnails'] = None
@@ -35,7 +36,6 @@ def get_meta(youtube_id):
     res['subtitles'] = None
     res['heatmap'] = None
     res['requested_formats'] = None
-    print(json.dumps(res))
     return res
 
 
