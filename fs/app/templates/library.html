@@ -10,9 +10,7 @@
                     <h1>Library</h1>
                 </div>
                 <div class="row selection position-relative">
-                    <div class="col-1">
-                        <div class="square thumbnail" style="background-image: url('/static/images/youtube.png')"></div>
-                    </div>
+                    <div class="col-1 square thumbnail" style="background-image: url('/static/images/youtube.png')"></div>
                     <div class="col text-800 d-flex align-items-center">
                         <div>
                             <h5>
@@ -26,9 +24,7 @@
                 <hr>
                 {% for f in files %}
                 <div class="row selection position-relative">
-                    <div class="col-1">
-                        <div class="square thumbnail" style="background-image: url('{{ f.thumbnail }}')"></div>
-                    </div>
+                    <div class="col-1 square thumbnail" style="background-image: url('{{ f.thumbnail }}')"></div>
                     <div class="col d-flex align-items-center">
                         <div>
                             <h5 class="flex-1">

@@ -52,10 +52,10 @@
                 <hr>
                 <form action="/search" method="get">
                     <div class="row">
-                        <div class="col-10">
+                        <div class="col-lg-10 col-sm-12">
                             <input class="form-control" type="text" name="q" value="{{ query or "" }}" placeholder="Search">
                         </div>
-                        <div class="col-2">
+                        <div class="col-lg-2 col-sm-12">
                             <button type="submit" class="btn btn-secondary"><i class="bi bi-search">Search</i></button>
                         </div>
                     </div>
@@ -65,23 +65,21 @@
                     <div class="row">
                         <div class="col-11 position-relative selection">
                             <div class="row">
-                            <div class="col-1">
-                                <div class="square thumbnail" style="background-image: url('{{ f.thumbnail }}')"></div>
-                            </div>
-                            <div class="col d-flex align-items-center">
-                                <div>
-                                    <h5 class="flex-1">
-                                        <a class="stretched-link link-light link-underline link-underline-opacity-0
-                                                  link-underline-opacity-75-hover play" data-id="{{ f.id }}" href="#">
-                                            {{ f.title | default(f.fulltitle | default("Unknown artist")) }}
-                                        </a>
-                                    </h5>
-                                    <p class="text-secondary">{{ f.uploader | default("Unknown artist") }}</p>
+                                <div class="col-1 square thumbnail" style="background-image: url('{{ f.thumbnail }}')"></div>
+                                <div class="col d-flex align-items-center">
+                                    <div>
+                                        <h5 class="flex-1">
+                                            <a class="stretched-link link-light link-underline link-underline-opacity-0
+                                                      link-underline-opacity-75-hover play" data-id="{{ f.id }}" href="#">
+                                                {{ f.title | default(f.fulltitle | default("Unknown artist")) }}
+                                            </a>
+                                        </h5>
+                                        <p class="text-secondary">{{ f.uploader | default("Unknown artist") }}</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-1 d-flex align-items-center justify-content-center">
-                                <h3><i class="bi-play-fill"></i></h3>
-                            </div>
+                                <div class="col-1 d-flex align-items-center justify-content-center">
+                                    <h3><i class="bi-play-fill"></i></h3>
+                                </div>
                             </div>
                         </div>
                         <div class="col-1 d-flex align-items-center justify-content-center convert"
