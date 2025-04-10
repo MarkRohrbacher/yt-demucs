@@ -151,7 +151,9 @@
             connectVolume('vocals');
             connectVolume('other');
 
-            playpause.addEventListener("click", function() {
+            playpause.addEventListener("click", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
                 if (master.paused) {
                     if (master.ended) {
                         master.currentTime = 0;
