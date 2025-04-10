@@ -21,22 +21,18 @@ def _cached_get_meta(youtube_id):
 @filecache.filecache(filecache.WEEK)
 def _cached_search_youtube(q):
     with YoutubeDL({"quiet": True}) as ydl:
-        all_info = ydl.extract_info(f"ytsearch5:{q}", download=False)
-        return json.dumps(all_info['entries'])
+        all_info = ydl.extract_info(f"ytsearch5:{q}", download=False, process=False)
+        entries = []
+        for e in all_info['entries']:
+            if e.get('thumbnail') is None:
+                e['thumbnail'] = e.get('thumbnails', [{ 'url': '' }])[-1]['url']
+            entries.append(e)
+        return json.dumps(entries)
 
 
 def get_meta(youtube_id):
     s = _cached_get_meta(youtube_id)
-    res = json.loads(_cached_get_meta(youtube_id))
-    # remove unneeded slack
-    res['fragments'] = None
-    res['formats'] = None
-    res['thumbnails'] = None
-    res['automatic_captions'] = None
-    res['subtitles'] = None
-    res['heatmap'] = None
-    res['requested_formats'] = None
-    return res
+    return json.loads(_cached_get_meta(youtube_id))
 
 
 def search_youtube(q):
