@@ -21,6 +21,13 @@ COPY fs/app/requirements.txt /app/requirements.txt
 RUN pip install -r requirements.txt && \
     rm -rf .cache/pip
 
+COPY fs/etc/apt/sources.list.d/chris-needham-ubuntu-ppa-noble.sources /etc/apt/sources.list.d/chris-needham-ubuntu-ppa-noble.sources
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes \
+        audiowaveform && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY fs /
 
 VOLUME /app/static/music
