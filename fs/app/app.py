@@ -58,7 +58,10 @@ def mainpage(path):
 def play(youtube_id):
     try:
         meta = get_meta(youtube_id)
-        return render_template("play.html", file=meta)
+        waveform = {}
+        with open(f"static/music/{youtube_id}/waveform.json") as waveformfile:
+            waveform = json.load(waveformfile)
+        return render_template("play.html", file=meta, waveform=waveform)
     except Exception as e:
         print(f"Got Exception: {e}")
         return "File not found", 404

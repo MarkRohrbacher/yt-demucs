@@ -63,22 +63,6 @@
                         <hr>
                         <div class="row mb-3">
                             <div class="col-2">
-                                <a href="#" class="btn btn-secondary" id="play">
-                                    <i class="bi bi-play"></i>
-                                </a>
-                            </div>
-                            <div class="col-2">
-                                <div id="position_string">0:00</div>
-                            </div>
-                            <div class="col">
-                                <input class="form-range" type="range" value="0" max="0" min="0" id="position">
-                            </div>
-                            <div class="col-2">
-                                <span id="duration_string">0:00</span>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-2">
                                 Speed
                             </div>
                             <div class="col btn-group">
@@ -98,7 +82,28 @@
                         </div>
                     </div>
                 </div>
-
+                <hr>
+                <div class="row">
+                    <div class="col">
+                        <a href="#" class="btn btn-secondary" id="remove-loop">
+                            Remove loop&nbsp;<i class="bi bi-repeat"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-2">
+                        <a href="#" class="btn btn-secondary" id="play">
+                            <i class="bi bi-play"></i>
+                        </a>
+                    </div>
+                    <div class="col-2">
+                        <div id="position_string">0:00</div>
+                    </div>
+                    <div class="col" id="waveform"></div>
+                    <div class="col-2">
+                        <span id="duration_string">0:00</span>
+                    </div>
+                </div>
             </div>
         </main>
 
@@ -117,7 +122,6 @@
 
         <script>
             const playpause = document.getElementById('play');
-            const position = document.getElementById('position');
             const speed = document.getElementsByName('speed');
             const master = document.getElementsByClassName('master')[0];
             const slaves = document.getElementsByClassName('slave');
@@ -175,16 +179,14 @@
                 for (let e of slaves) {
                     e.play();
                 }
+                playpause.innerHTML = '<i class="bi bi-pause"></i>';
             });
             master.addEventListener("pause", function() {
                 for (let e of slaves) {
                     e.pause();
                 }
+                playpause.innerHTML = '<i class="bi bi-play"></i>';
             });
-
-            let positionDragging = false;
-            position.addEventListener("mousedown", function() { positionDragging = true; });
-            position.addEventListener("mouseup", function() { positionDragging = false; });
 
             master.addEventListener("timeupdate", function() {
                 const time = this.currentTime;
@@ -209,22 +211,15 @@
                         }
                     }
                 }
-                if (!positionDragging) {
-                    position.value = Math.floor(this.currentTime);
-                }
                 positionElement.innerText = secondsToTimeString(this.currentTime);
             });
 
             master.addEventListener("ended", function() { playpause.innerHTML = '<i class="bi bi-play"></i>'; });
 
             master.addEventListener("canplay", function() {
-                position.setAttribute("max", this.duration);
                 durationElement.innerText = secondsToTimeString(this.duration);
             });
 
-            position.addEventListener("change", function() {
-                master.currentTime = this.value;
-            });
             for (let s of speed) {
                 s.addEventListener("click", function() {
                     master.playbackRate = this.value;
@@ -234,7 +229,82 @@
                 });
             }
         </script>
-</body>
+        <script src="https://unpkg.com/wavesurfer.js@7"></script>
+        <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/regions.min.js"></script>
+        <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/minimap.min.js"></script>
+        <script>
+            const f = {{ file | tojson }};
+            const peaks = [ {{ waveform.data | tojson }} ];
+            const regions = WaveSurfer.Regions.create();
+            const minimap = WaveSurfer.Minimap.create({
+                height: 20,
+                waveColor: 'rgb(200, 200, 255)',
+                progressColor: 'rgb(13, 110, 253)',
+            });
+            const waveSurfer = WaveSurfer.create({
+                container: '#waveform',
+                waveColor: 'rgb(200, 200, 255)',
+                progressColor: 'rgb(13, 110, 253)',
+                minPxPerSec: 100,
+                hideScrollbar: true,
+                autoCenter: true,
+                barWidth: 4,
+                barGap: 4,
+                barRadius: 4,
+                duration: {{ file.duration }},
+                plugins: [ regions, minimap ],
+                media: master,
+                peaks: peaks,
+            });
+
+            inactiveRegionColor = 'rgba(255, 255, 255, 0.2)';
+            activeRegionColor = 'rgba(255, 0, 0, 0.4)';
+
+            regions.enableDragSelection({
+                color: inactiveRegionColor,
+            });
+            let activeRegion = null;
+            regions.on('region-created', (region) => {
+                region.setOptions({ drag: false, resize: true });
+                /* HACK */ region.setOptions({ start: region.start.toFixed(6), end: region.end.toFixed(6) });
+                activeRegion = null;
+                for (let r of regions.getRegions()) {
+                    if (r.id != region.id)
+                        r.remove();
+                }
+            });
+            regions.on('region-updated', (region) => {
+                /* HACK */ region.setOptions({ start: region.start.toFixed(6), end: region.end.toFixed(6) });
+            });
+            regions.on('region-clicked', (region, e) => {
+                e.stopPropagation();
+                activeRegion = region;
+                region.setOptions({ color: activeRegionColor });
+                region.play();
+            });
+            regions.on('region-out', (region) => {
+                window.setTimeout(() => {
+                    if (activeRegion) {
+                        activeRegion.play();
+                    }
+                }, 0);
+            });
+            waveSurfer.on('interaction', () => {
+                if (activeRegion) {
+                    activeRegion.setOptions({ color: inactiveRegionColor });
+                    activeRegion = null;
+                }
+            });
+            minimap.on('interaction', () => {
+                activeRegion = null;
+            });
+            document.getElementById('remove-loop').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                regions.clearRegions();
+            });
+        </script>
+    </body>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
