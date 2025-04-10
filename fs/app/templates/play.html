@@ -119,8 +119,16 @@
         <audio id="other" class="slave track">
             <source src="/static/music/{{ file.id }}/other.flac" type="audio/flac"></source>
         </audio>
-
+        <audio id="metronome" class="slave track" muted>
+            <source src="/static/music/{{ file.id }}/metronome.flac" type="audio/flac"></source>
+        </audio>
         <script>
+            let nextTick = null;
+            let metronomeFrequency = {{ beats.bpm }};
+            let metronomeRunning = false;
+            let metronomeAuto = false;
+            const METRONOME_TICK = .2;
+
             const playpause = document.getElementById('play');
             const speed = document.getElementsByName('speed');
             const master = document.getElementsByClassName('master')[0];
@@ -229,6 +237,108 @@
                         e.playbackRate = this.value;
                     }
                 });
+            }
+
+            /* metronome */
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const audioCtx = new AudioContext();
+            fetch("/static/sounds/metronome.flac")
+                .then(resp => resp.arrayBuffer())
+                .then(buf => audioCtx.decodeAudioData(buf))
+                .then(audioBuffer => {
+                    window.metronomeBuffer = audioBuffer;
+                })
+
+            function click(when) {
+                const source = audioCtx.createBufferSource();
+                source.buffer = window.metronomeBuffer;
+                source.connect(audioCtx.destination);
+                source.start(when);
+            }
+
+            metronomeTick = function() {
+                if (!metronomeRunning || metronomeAuto) {
+                    return;
+                }
+                const currentTime = audioCtx.currentTime;
+                if (nextTick === null) {
+                    nextTick = currentTime + .1;
+                }
+                if (currentTime > nextTick - METRONOME_TICK) {
+                    if (nextTick > currentTime) {
+                        click(nextTick);
+                    }
+                    nextTick = nextTick + (60 / metronomeFrequency);
+                }
+            }
+            setInterval(metronomeTick, 1000 * METRONOME_TICK);
+
+            window.metronome = {
+                start: function(freq) {
+                    this.init();
+                    metronomeRunning = true;
+                    if (freq && freq > 0) {
+                        metronomeFrequency = freq;
+                    }
+                    nextTick = null;
+                    this.updateButtons();
+                },
+                toggleAuto: function(freq) {
+                    this.init();
+                    if (metronomeAuto) {
+                        metronomeRunning = false;
+                        metronomeAuto = false;
+                    } else {
+                        metronomeRunning = true;
+                        metronomeAuto = true;
+                    }
+                    nextTick = null;
+                    this.updateButtons();
+                },
+                toggle: function() {
+                    this.init();
+                    if (metronomeAuto) {
+                        metronomeAuto = false;
+                        metronomeRunning = true;
+                    } else {
+                        metronomeRunning = !metronomeRunning;
+                    }
+                    nextTick = null;
+                    this.updateButtons();
+                },
+                stop: function() {
+                    metronomeRunning = false;
+                    nextTick = null;
+                    this.updateButtons()
+                },
+                changeSpeed: function(freqdiff) {
+                    metronomeFrequency = Math.min(Math.max(metronomeFrequency + freqdiff, 40), 240);
+                    metronomeAuto = false;
+                    nextTick = null;
+                    this.updateButtons();
+                },
+                init: function() {
+                    const silence = audioCtx.createBufferSource();
+                    silence.connect(audioCtx.destination);
+                    silence.start();
+                },
+                updateButtons: function() {
+                    console.debug("update buttons", metronomeRunning, metronomeAuto);
+                    if (!metronomeRunning) {
+                        document.getElementById('metronome-auto').classList.remove('active');
+                        document.getElementById('metronome-manual').classList.remove('active');
+                        document.getElementById('metronome').muted = true;
+                    } else if (metronomeAuto) {
+                        document.getElementById('metronome-auto').classList.add('active');
+                        document.getElementById('metronome-manual').classList.remove('active');
+                        document.getElementById('metronome').muted = false;
+                    } else {
+                        document.getElementById('metronome-auto').classList.remove('active');
+                        document.getElementById('metronome-manual').classList.add('active');
+                        document.getElementById('metronome').muted = true;
+                    }
+                    document.getElementById('metronome-frequency').innerText = metronomeFrequency;
+                }
             }
         </script>
         <script src="https://unpkg.com/wavesurfer.js@7"></script>

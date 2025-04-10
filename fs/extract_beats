@@ -1,0 +1,39 @@
+#!/usr/bin/python3
+
+import json
+import librosa
+import numpy
+import soundfile
+import sys
+from pathlib import Path
+
+fullfile = Path(sys.argv[1])
+tickfile = Path(sys.argv[2])
+
+beatsfile = Path(fullfile.parent, "beats.json")
+metronomefile = Path(fullfile.parent, "metronome.flac")
+
+samples, samplingrate = librosa.load(str(fullfile), sr=None)
+bpm, beats = librosa.beat.beat_track(y=samples, sr=samplingrate, units='samples', trim=False)
+
+with open(beatsfile, "w") as b:
+    json.dump({
+        "beats": librosa.samples_to_time(beats, sr=samplingrate).tolist(),
+        "bpm": round(bpm),
+        }, b)
+
+ticksamples, _ = librosa.load(str(tickfile), sr=samplingrate)
+
+metronomesamples = numpy.zeros(len(samples))
+for beat in beats:
+    beatlen = len(ticksamples)
+    beatend = beat + beatlen
+    if beatend > len(metronomesamples):
+        diff = beatend - len(metronomesamples)
+        beatend = beatend - diff
+        beatlen = beatend - beat
+
+    metronomesamples[beat:beatend] = ticksamples[0:beatlen]
+
+soundfile.write(str(metronomefile), metronomesamples, samplingrate, format='flac', subtype='PCM_16')
+
