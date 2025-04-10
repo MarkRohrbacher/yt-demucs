@@ -14,14 +14,24 @@ app = Flask(__name__)
 @filecache.filecache(filecache.WEEK)
 def _cached_get_meta(youtube_id):
     with YoutubeDL({"quiet": True}) as ydl:
-        meta = ydl.extract_info(youtube_id, download=False)
+        meta = None
+        try:
+            meta = ydl.extract_info(youtube_id, download=False, process=False)
+        except Exception as e:
+            app.logger.error(f"Caught exception {e}")
+            meta = ydl.extract_info(youtube_id, download=False)
         return json.dumps(meta)
 
 
 @filecache.filecache(filecache.WEEK)
 def _cached_search_youtube(q):
     with YoutubeDL({"quiet": True}) as ydl:
-        all_info = ydl.extract_info(f"ytsearch5:{q}", download=False, process=False)
+        all_info = None
+        try:
+            all_info = ydl.extract_info(f"ytsearch5:{q}", download=False, process=False)
+        except Exception as e:
+            app.logger.error(f"Caught exception {e}")
+            all_info = ydl.extract_info(f"ytsearch5:{q}", download=False)
         entries = []
         for e in all_info['entries']:
             if e.get('thumbnail') is None:
