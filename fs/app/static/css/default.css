@@ -16,8 +16,7 @@
 .container {
     min-height: 100vh;
 }
-.selection:hover, .selection:hover a {
+.selection:hover, .selection:hover {
     background-color: var(--bs-secondary-bg);
-    color: var(--bs-primary-text-emphasis) !important;
 }
 

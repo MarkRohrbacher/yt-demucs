@@ -3,10 +3,12 @@ import subprocess
 import filecache
 import base64
 from pathlib import Path
-from flask import Flask, render_template, request, Response, send_from_directory
+from flask import Flask, render_template, request, Response, send_from_directory, redirect
 from glob import glob
 from yt_dlp import YoutubeDL
 import json
+import shutil
+import os
 
 app = Flask(__name__)
 
@@ -128,6 +130,14 @@ def preview(youtube_id):
         proc.wait()
 
     return Response(generate(), mimetype='audio/x-flac')
+
+
+@app.route("/delete/<youtube_id>")
+def delete(youtube_id):
+    path = f"static/music/{youtube_id}"
+    if os.path.exists(path + "/full.flac"):
+        shutil.rmtree(path)
+    return redirect("/library", code=302)
 
 
 @app.route("/convert/<youtube_id>")

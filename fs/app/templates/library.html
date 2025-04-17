@@ -4,6 +4,20 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body>
+        <div class="modal fade" id="delete-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Are you sure you want to delete <span id="delete-title"></span>?</h5>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <a href="#" id="delete-link" class="btn btn-danger">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <main class="main">
             <div class="container bg-body-tertiary" data-layout="container">
                 <div class="row text-center">
@@ -23,23 +37,33 @@
                 </div>
                 <hr>
                 {% for f in files %}
-                <div class="row mx-3 selection position-relative">
-                    <div class="col-1 square thumbnail" style="background-image: url('{{ f.thumbnail }}')"></div>
-                    <div class="col d-flex align-items-center">
-                        <div>
-                            <h5 class="flex-1">
-                                <a class="stretched-link link-light link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="/play/{{ f.id }}">
-                                    {{ f.title | default(f.fulltitle | default("Unknown artist")) }}
-                                </a>
-                            </h5>
-                            <p class="text-secondary">{{ f.uploader | default("Unknown artist") }}</p>
+                <div class="row mx-3 position-relative">
+                    <div class="col-11 position-relative selection">
+                        <div class="row">
+                            <div class="col-1 square thumbnail" style="background-image: url('{{ f.thumbnail }}')"></div>
+                            <div class="col d-flex align-items-center">
+                                <div>
+                                    <h5 class="flex-1">
+                                        <a class="stretched-link link-light link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="/play/{{ f.id }}">
+                                            {{ f.title | default(f.fulltitle | default("Unknown artist")) }}
+                                        </a>
+                                    </h5>
+                                    <p class="text-secondary">{{ f.uploader | default("Unknown artist") }}</p>
+                                </div>
+                            </div>
+                            <div class="col-1 d-flex align-items-center justify-content-center">
+                                <h3><i class="bi-play-fill"></i></h3>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-1 d-flex align-items-center justify-content-center">
-                        <h3><i class="bi-play-fill"></i></h3>
-                    </div>
-                    <div class="col-1 d-flex align-items-center justify-content-center">
-                        <h3><i class="bi-trash"></i></h3>
+                    <div class="col-1 d-flex align-items-center justify-content-center selection">
+                        <h3>
+                                <a href="#" class="btn link-danger delete-link"
+                                            data-bs-toggle="modal" data-bs-target="#delete-modal" data-id="{{ f.id }}"
+                                                                                                  data-title="{{ f.title }}">
+                                    <i class="bi-trash"></i>
+                                </a>
+                        </h3>
                     </div>
                 </div>
                 {% endfor %}
@@ -50,4 +74,19 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="/static/css/default.css" rel="stylesheet">
+    <script>
+        const deleteElement = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const id = this.getAttribute("data-id");
+            const title = this.getAttribute("data-title");
+            document.getElementById('delete-title').innerText = title;
+            document.getElementById('delete-link').href = "/delete/" + id;
+            console.log("delete", id);
+        }
+        for (let e of document.getElementsByClassName('delete-link')) {
+            e.addEventListener('click', deleteElement);
+        }
+    </script>
 </html>
