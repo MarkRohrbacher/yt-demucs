@@ -52,7 +52,7 @@ def search_youtube(q):
 
 @app.route("/", defaults={"path": ""})
 @app.route("/library", defaults={"path": ""})
-@app.route("/<path:path>")
+# @app.route("/<path:path>")
 def mainpage(path):
     files = []
     for file in glob("*", root_dir="static/music"):
