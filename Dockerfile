@@ -32,4 +32,4 @@ COPY fs /
 
 VOLUME /app/static/music
 
-CMD [ "gunicorn", "-w", "4", "-b", "0.0.0.0", "app:app" ]
+CMD [ "gunicorn", "--workers", "4", "--bind", "0.0.0.0", "--timeout", "0", "app:app" ]
