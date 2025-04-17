@@ -2,4 +2,4 @@
 
 cd $(dirname "$0")
 
-docker build -t music .
+docker build -t yt-demucs:latest .

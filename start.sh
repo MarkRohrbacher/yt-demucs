@@ -2,13 +2,10 @@
 
 NVIDIA_SETTINGS="--gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864"
 
-docker stop music
-docker rm music
-
 docker run -d \
     $NVIDIA_SETTINGS \
     --restart=unless-stopped \
-    --name=music \
+    --name=yt-demucs \
     --publish 80:8000 \
     -v ./mount/music:/app/static/music \
-    music
+    yt-demucs
