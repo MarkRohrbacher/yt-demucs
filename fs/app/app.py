@@ -85,9 +85,18 @@ def play(youtube_id):
     try:
         meta = get_meta(youtube_id)
         waveform = {}
-        with open(f"static/music/{youtube_id}/waveform.json") as waveformfile:
-            waveform = json.load(waveformfile)
-        return render_template("play.html", file=meta, waveform=waveform)
+        beats = []
+        try:
+            with open(f"static/music/{youtube_id}/waveform.json") as waveformfile:
+                waveform = json.load(waveformfile)
+        except:
+            pass
+        try:
+            with open(f"static/music/{youtube_id}/beats.json") as beatsfile:
+                beats = json.load(beatsfile)
+        except:
+            pass
+        return render_template("play.html", file=meta, waveform=waveform, beats=beats)
     except Exception as e:
         print(f"Got Exception: {e}")
         return "File not found", 404

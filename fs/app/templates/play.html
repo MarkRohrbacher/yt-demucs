@@ -7,7 +7,7 @@
         <main class="main">
             <div class="container bg-body-tertiary" data-layout="container">
                 <div class="row text-center">
-                    <h1>{{ file.title }}</h1>
+                    <h1 style="text-overflow:ellipsis">{{ file.title }}</h1>
                 </div>
                 <hr>
                 <div class="row">
@@ -80,28 +80,75 @@
                                 <label class="btn btn-outline-secondary" for="speed100">Original</label>
                             </div>
                         </div>
+                        <div class="row mb-3">
+                            <div class="col-2">
+                                Metronome
+                            </div>
+                            <div class="col-md-auto">
+                                <a href="javascript:metronome.toggleAuto();" class="btn btn-outline-secondary" id="metronome-auto">
+                                    Auto <i class="bi bi-stopwatch"></i>
+                                </a>
+                            </div>
+                            <div class="col btn-group">
+                                <a href="javascript:metronome.changeSpeed(-10);" class="btn btn-outline-secondary">
+                                    -10 <i class="bi bi-rewind-fill"></i>
+                                </a>
+                                <a href="javascript:metronome.changeSpeed(-1);" class="btn btn-outline-secondary">
+                                    -1 <i class="bi bi-rewind"></i>
+                                </a>
+                                <a href="javascript:metronome.toggle();" class="btn btn-outline-secondary" id="metronome-manual">
+                                    <span id="metronome-frequency">{{ beats.bpm }}</span> <i class="bi bi-stopwatch"></i>
+                                </a>
+                                <a href="javascript:metronome.changeSpeed(1);" class="btn btn-outline-secondary">
+                                    +1 <i class="bi bi-fast-forward"></i>
+                                </a>
+                                <a href="javascript:metronome.changeSpeed(10);" class="btn btn-outline-secondary">
+                                    +10 <i class="bi bi-fast-forward-fill"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <hr>
                 <div class="row">
+                    <div class="col-md-auto">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Control</h5>
+                                <a href="#" class="btn btn-secondary" id="play">
+                                    Play <i class="bi bi-play"></i>
+                                </a>
+                                <a href="#" class="btn btn-secondary" id="play-loop">
+                                    Play Loop <i class="bi bi-repeat"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col">
-                        <a href="#" class="btn btn-secondary" id="remove-loop">
-                            Remove loop&nbsp;<i class="bi bi-repeat"></i>
-                        </a>
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Loops</h5>
+                                <a href="#" class="btn btn-secondary" id="start-loop">
+                                    Set Start
+                                </a>
+                                <a href="#" class="btn btn-secondary" id="end-loop">
+                                    Set End
+                                </a>
+                                <a href="#" class="btn btn-secondary" id="remove-loop">
+                                    Clear
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="row mb-3">
-                    <div class="col-2">
-                        <a href="#" class="btn btn-secondary" id="play">
-                            <i class="bi bi-play"></i>
-                        </a>
+                <hr>
+                <div class="row mb-3 align-items-center">
+                    <div class="col pr-5" style="overflow: hidden">
+                        <div id="wavetimeline"></div>
+                        <div id="waveform"></div>
                     </div>
-                    <div class="col-2">
-                        <div id="position_string">0:00</div>
-                    </div>
-                    <div class="col" id="waveform"></div>
-                    <div class="col-2">
-                        <span id="duration_string">0:00</span>
+                    <div class="col-md-auto">
+                        <span id="position_string">0:00</span> / <span id="duration_string">0:00</span>
                     </div>
                 </div>
             </div>
@@ -122,6 +169,10 @@
         <audio id="metronome" class="slave track" muted>
             <source src="/static/music/{{ file.id }}/metronome.flac" type="audio/flac"></source>
         </audio>
+        <script>
+            const beats = {{ beats.beats | tojson }};
+            const peaks = [ {{ waveform.data | tojson }} ];
+        </script>
         <script>
             let nextTick = null;
             let metronomeFrequency = {{ beats.bpm }};
@@ -166,11 +217,11 @@
                     if (master.ended) {
                         master.currentTime = 0;
                     }
-                    playpause.innerHTML = '<i class="bi bi-pause"></i>';
+                    playpause.innerHTML = 'Pause <i class="bi bi-pause"></i>';
                     master.play();
                 }
                 else {
-                    playpause.innerHTML = '<i class="bi bi-play"></i>';
+                    playpause.innerHTML = 'Play <i class="bi bi-play"></i>';
                     master.pause();
                 }
             });
@@ -189,13 +240,13 @@
                 for (let e of slaves) {
                     e.play();
                 }
-                playpause.innerHTML = '<i class="bi bi-pause"></i>';
+                playpause.innerHTML = 'Pause <i class="bi bi-pause"></i>';
             });
             master.addEventListener("pause", function() {
                 for (let e of slaves) {
                     e.pause();
                 }
-                playpause.innerHTML = '<i class="bi bi-play"></i>';
+                playpause.innerHTML = 'Play <i class="bi bi-play"></i>';
             });
 
             master.addEventListener("timeupdate", function() {
@@ -213,10 +264,10 @@
                         e.currentTime = this.currentTime;
                     } else {
                         if (diff > 0) {
-                            e.playbackRate = this.playbackRate * .98;
+                            e.playbackRate = this.playbackRate * .95;
                             console.debug(e.id + " soft sync (slow down)", time, diff);
                         } else {
-                            e.playbackRate = this.playbackRate * 1.02;
+                            e.playbackRate = this.playbackRate * 1.05;
                             console.debug(e.id + " soft sync (speed up)", time, diff);
                         }
                     }
@@ -224,7 +275,7 @@
                 positionElement.innerText = secondsToTimeString(this.currentTime);
             });
 
-            master.addEventListener("ended", function() { playpause.innerHTML = '<i class="bi bi-play"></i>'; });
+            master.addEventListener("ended", function() { playpause.innerHTML = 'Play <i class="bi bi-play"></i>'; });
 
             master.addEventListener("canplay", function() {
                 durationElement.innerText = secondsToTimeString(this.duration);
@@ -344,14 +395,27 @@
         <script src="https://unpkg.com/wavesurfer.js@7"></script>
         <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/regions.min.js"></script>
         <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/minimap.min.js"></script>
+        <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/timeline.min.js"></script>
         <script>
-            const f = {{ file | tojson }};
-            const peaks = [ {{ waveform.data | tojson }} ];
-            const regions = WaveSurfer.Regions.create();
+        window.addEventListener('load', function() {
+            const regionplugin = WaveSurfer.Regions.create();
+            const beatsplugin = WaveSurfer.Regions.create();
             const minimap = WaveSurfer.Minimap.create({
-                height: 20,
+                height: 40,
                 waveColor: 'rgb(200, 200, 255)',
                 progressColor: 'rgb(13, 110, 253)',
+            });
+            const timeline = WaveSurfer.Timeline.create({
+                height: 20,
+                // insertPosition: 'beforebegin',
+                container: '#wavetimeline',
+                timeInterval: 0.2,
+                primaryLabelInterval: 5,
+                secondaryLabelInterval: 1,
+                style: {
+                    fontSize: '15px',
+                    color: '#2D5B88',
+                }
             });
             const waveSurfer = WaveSurfer.create({
                 container: '#waveform',
@@ -364,37 +428,38 @@
                 barGap: 4,
                 barRadius: 4,
                 duration: {{ file.duration }},
-                plugins: [ regions, minimap ],
+                plugins: [ regionplugin, beatsplugin, minimap, timeline ],
                 media: master,
                 peaks: peaks,
+                normalize: false,
             });
-
+            for (let b of beats) {
+                beatsplugin.addRegion({
+                    start: b,
+                    end: b,
+                    drag: false,
+                    resize: false,
+                    color: 'rgb(255, 0, 0)',
+                });
+            }
             inactiveRegionColor = 'rgba(255, 255, 255, 0.2)';
             activeRegionColor = 'rgba(255, 0, 0, 0.4)';
 
-            regions.enableDragSelection({
-                color: inactiveRegionColor,
-            });
             let activeRegion = null;
-            regions.on('region-created', (region) => {
-                region.setOptions({ drag: false, resize: true });
+            regionplugin.on('region-created', (region) => {
                 /* HACK */ region.setOptions({ start: region.start.toFixed(6), end: region.end.toFixed(6) });
                 activeRegion = null;
-                for (let r of regions.getRegions()) {
-                    if (r.id != region.id)
-                        r.remove();
-                }
             });
-            regions.on('region-updated', (region) => {
+            regionplugin.on('region-updated', (region) => {
                 /* HACK */ region.setOptions({ start: region.start.toFixed(6), end: region.end.toFixed(6) });
             });
-            regions.on('region-clicked', (region, e) => {
+            regionplugin.on('region-clicked', (region, e) => {
                 e.stopPropagation();
                 activeRegion = region;
                 region.setOptions({ color: activeRegionColor });
                 region.play();
             });
-            regions.on('region-out', (region) => {
+            regionplugin.on('region-out', (region) => {
                 window.setTimeout(() => {
                     if (activeRegion) {
                         activeRegion.play();
@@ -410,11 +475,62 @@
             minimap.on('interaction', () => {
                 activeRegion = null;
             });
+            document.getElementById('start-loop').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const regions = regionplugin.getRegions();
+                if (regions.length == 0) {
+                    regionplugin.addRegion({
+                        start: master.currentTime,
+                        end: master.duration,
+                        color: inactiveRegionColor,
+                        drag: false,
+                        resize: true,
+                    });
+                }
+                else {
+                    regions[0].setOptions({
+                        start: master.currentTime,
+                    });
+                }
+            });
+            document.getElementById('end-loop').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const regions = regionplugin.getRegions();
+                if (regions.length == 0) {
+                    regionplugin.addRegion({
+                        start: 0,
+                        end: master.currentTime,
+                        color: inactiveRegionColor,
+                        drag: false,
+                        resize: true,
+                    });
+                }
+                else {
+                    regions[0].setOptions({
+                        end: master.currentTime,
+                        color: inactiveRegionColor,
+                    });
+                }
+            });
+            document.getElementById('play-loop').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const regions = regionplugin.getRegions();
+                if (regions.length != 0) {
+                    activeRegion = regions[0];
+                    activeRegion.setOptions({ color: activeRegionColor });
+                    activeRegion.play();
+                }
+            });
             document.getElementById('remove-loop').addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                regions.clearRegions();
+                activeRegion = null;
+                regionplugin.clearRegions();
             });
+        });
         </script>
     </body>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
