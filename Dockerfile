@@ -32,4 +32,4 @@ COPY fs /
 
 VOLUME /app/static/music
 
-CMD [ "python3", "-u", "-m", "flask", "run", "--port", "8080", "--host", "0.0.0.0" ]
+CMD [ "gunicorn", "-w", "4", "-b", "0.0.0.0", "app:app" ]
