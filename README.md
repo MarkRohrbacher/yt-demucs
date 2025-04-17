@@ -27,6 +27,7 @@ Note, that it's recommended to run this on a Cuda-enabled machine.
 
 - [Docker](https://docker.io)
 - [NVIDIA Container Toolkit](https://github.com/NVIDIA/nvidia-container-toolkit) (optional, but highly recommended)
+- More than 30GB free disk space
 
 ## Installation
 
