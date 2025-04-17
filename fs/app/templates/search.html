@@ -2,12 +2,6 @@
 <html data-bs-theme="dark">
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <style>
-.convert:hover {
-    color: var(--bs-danger-text-emphasis);
-    background-color: var(--bs-secondary-bg);
-};
-        </style>
     </head>
     <body>
         <div class="modal fade" id="conversion-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
@@ -62,7 +56,7 @@
                 </form>
                 <hr>
                 {% for f in files %}
-                    <div class="row">
+                    <div class="row mx-3">
                         <div class="col-11 position-relative selection">
                             <div class="row">
                                 <div class="col-1 square thumbnail" style="background-image: url('{{ f.thumbnail }}')"></div>
@@ -82,9 +76,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-1 d-flex align-items-center justify-content-center convert"
-                             data-bs-toggle="modal" data-bs-target="#conversion-modal" data-id="{{ f.id }}">
-                            <h3><i class="bi-cloud-plus-fill"></i></h3>
+                        <div class="col-1 d-flex align-items-center justify-content-center position-relative selection">
+                            <a href="#" class="convert stretched-link link-danger" data-bs-toggle="modal" data-bs-target="#conversion-modal" data-id="{{ f.id }}">
+                                <h3><i class="bi-cloud-plus-fill"></i></h3>
+                            </a>
                         </div>
                     </div>
                 {% endfor %}
