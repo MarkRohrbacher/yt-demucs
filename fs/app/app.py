@@ -74,7 +74,8 @@ def mainpage(path):
     for file in glob("*", root_dir="static/music"):
         try:
             files.append(get_meta(file))
-        except:
+        except Exception as e:
+            app.logger.error(f"Cannot get meta for {file}: {e}")
             pass
 
     return render_template("library.html", files=files)
