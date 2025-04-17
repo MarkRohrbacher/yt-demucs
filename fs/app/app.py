@@ -10,9 +10,14 @@ import json
 
 app = Flask(__name__)
 
+last_search = []
 
 @filecache.filecache(filecache.WEEK)
 def _cached_get_meta(youtube_id):
+    for e in last_search:
+        if e.get('id', '') == youtube_id:
+            return json.dumps(e)
+
     with YoutubeDL({"quiet": True}) as ydl:
         meta = None
         try:
@@ -37,12 +42,23 @@ def _cached_search_youtube(q):
             if e.get('thumbnail') is None:
                 e['thumbnail'] = e.get('thumbnails', [{ 'url': '' }])[-1]['url']
             entries.append(e)
+        global last_search
+        last_search = entries
         return json.dumps(entries)
 
 
 def get_meta(youtube_id):
+    try:
+        with open(f"static/music/{youtube_id}/meta.json") as metafile:
+            meta = json.load(metafile)
+        return meta
+    except:
+        pass
     s = _cached_get_meta(youtube_id)
-    return json.loads(_cached_get_meta(youtube_id))
+    with open(f"static/music/{youtube_id}/meta.json", "w") as metafile:
+        metafile.write(s)
+
+    return json.loads(s)
 
 
 def search_youtube(q):
