@@ -29,4 +29,4 @@ VOLUME /app/static/music
 
 EXPOSE 8000
 
-CMD [ "gunicorn", "--workers", "4", "--bind", "0.0.0.0", "--timeout", "0", "app:app" ]
+CMD [ "gunicorn", "--workers", "16", "--bind", "0.0.0.0", "--timeout", "0", "app:app" ]
