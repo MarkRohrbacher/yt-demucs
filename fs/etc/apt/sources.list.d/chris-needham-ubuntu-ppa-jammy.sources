@@ -1,6 +1,6 @@
 Types: deb
 URIs: https://ppa.launchpadcontent.net/chris-needham/ppa/ubuntu/
-Suites: noble
+Suites: jammy
 Components: main
 Signed-By: 
  -----BEGIN PGP PUBLIC KEY BLOCK-----
