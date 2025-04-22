@@ -19,4 +19,12 @@
 .selection:hover, .selection:hover {
     background-color: var(--bs-secondary-bg);
 }
+.btn-nohover:hover {
+    color: var(--bs-btn-color);
+    background-color: var(--bs-btn-bg);
+}
+.btn-nohover.active:hover {
+    color: var(--bs-btn-active-color);
+    background-color: var(--bs-btn-active-bg);
+}
 
