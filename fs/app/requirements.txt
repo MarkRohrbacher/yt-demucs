@@ -5,3 +5,4 @@ werkzeug ~= 2.0.3
 eventlet ~= 0.39
 filecache ~= 0.81
 gunicorn ~= 23.0
+gevent ~= 25.4
