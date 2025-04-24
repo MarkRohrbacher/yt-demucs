@@ -13,8 +13,11 @@ tickfile = Path(sys.argv[2])
 beatsfile = Path(fullfile.parent, "beats.json")
 metronomefile = Path(fullfile.parent, "metronome.flac")
 
-samples, samplingrate = librosa.load(str(fullfile), sr=None)
+samples, samplingrate = librosa.load(str(fullfile), sr=None, mono=True)
 bpm, beats = librosa.beat.beat_track(y=samples, sr=samplingrate, units='samples', trim=False)
+
+if isinstance(bpm, numpy.ndarray):
+    bpm = bpm[0]
 
 with open(beatsfile, "w") as b:
     json.dump({
