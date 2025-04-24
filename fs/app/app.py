@@ -53,7 +53,7 @@ def get_meta(youtube_id):
     try:
         with open(f"static/music/{youtube_id}/meta.json") as metafile:
             meta = json.load(metafile)
-        return meta
+            return meta
     except:
         pass
     s = _cached_get_meta(youtube_id)
