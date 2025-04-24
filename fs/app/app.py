@@ -7,6 +7,7 @@ from flask import Flask, render_template, request, Response, send_from_directory
 from glob import glob
 from yt_dlp import YoutubeDL
 import json
+import logging
 import shutil
 import os
 
@@ -101,7 +102,7 @@ def play(youtube_id):
             pass
         return render_template("play.html", file=meta, waveform=waveform, beats=beats)
     except Exception as e:
-        print(f"Got Exception: {e}")
+        app.logger.error(f"Got Exception: {e}")
         return "File not found", 404
 
 @app.route("/search")
@@ -160,4 +161,8 @@ def convert(youtube_id):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, server='eventlet')
+else:
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
 
