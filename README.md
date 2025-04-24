@@ -53,4 +53,32 @@ Without GPU support:
 
 You can access the container by browsing to http://127.0.0.1
 
+## Usage
+
+When opening the screen, you will be welcomed by an empty library.
+The only useful action here is to "Search on Youtube":
+
+![Empty library](/screenshots/empty-library.png?raw=true)
+
+Clicking the "Search on YouTube" link sends you to the search page:
+
+![Search page](/screenshots/search.png?raw=true)
+
+After entering a search query, it will return the 5 best matches from YouTube:
+
+![Search result](/screenshots/searchresult.png?raw=true)
+
+Pressing the red button (The cloud with the "+") will start the conversion and add
+the match to your library. As for now, you should wait until the conversion is completed
+(no error handling here yet)
+
+![Conversion](/screenshots/conversion.png?raw=true)
+
+When the conversion is completed, you will be automatically redirected to the library:
+
+![Library](/screenshots/library.png?raw=true)
+
+When clicking on the new entry, you will be redirected to the replay screen:
+
+![Replay screen](/screenshots/play.png?raw=true)
 
