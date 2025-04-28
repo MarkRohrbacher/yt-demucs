@@ -85,24 +85,24 @@
                                 Metronome
                             </div>
                             <div class="col-md-auto">
-                                <a href="javascript:document.getElementById('metronome').muted = !document.getElementById('metronome').muted;" class="btn btn-outline-secondary btn-nohover" id="metronome-auto">
+                                <a href="#" class="btn btn-outline-secondary btn-nohover" id="metronome-auto">
                                     Auto <i class="bi bi-stopwatch"></i>
                                 </a>
                             </div>
                             <div class="col btn-group">
-                                <a href="javascript:metronome.speed -= 10;" class="btn btn-outline-secondary btn-nohover">
+                                <a href="#" class="btn btn-outline-secondary btn-nohover metronome-speed-diff" data-speed-diff="-10">
                                     -10 <i class="bi bi-rewind-fill"></i>
                                 </a>
-                                <a href="javascript:metronome.speed--;" class="btn btn-outline-secondary btn-nohover">
+                                <a href="#" class="btn btn-outline-secondary btn-nohover metronome-speed-diff" data-speed-diff="-1">
                                     -1 <i class="bi bi-rewind"></i>
                                 </a>
-                                <a href="javascript:metronome.running = !metronome.running;" class="btn btn-outline-secondary btn-nohover" id="metronome-manual">
+                                <a href="#" class="btn btn-outline-secondary btn-nohover" id="metronome-manual">
                                     <span id="metronome-speed">{{ beats.bpm }}</span> <i class="bi bi-stopwatch"></i>
                                 </a>
-                                <a href="javascript:metronome.speed++;" class="btn btn-outline-secondary btn-nohover">
+                                <a href="#" class="btn btn-outline-secondary btn-nohover metronome-speed-diff" data-speed-diff="1">
                                     +1 <i class="bi bi-fast-forward"></i>
                                 </a>
-                                <a href="javascript:metronome.speed += 10;" class="btn btn-outline-secondary btn-nohover">
+                                <a href="#" class="btn btn-outline-secondary btn-nohover metronome-speed-diff" data-speed-diff="10">
                                     +10 <i class="bi bi-fast-forward-fill"></i>
                                 </a>
                             </div>
@@ -195,6 +195,18 @@
                     metronome.stop();
                 }
             });
+            document.getElementById('metronome-auto').addEventListener('click', function() {
+                const m = document.getElementById('metronome');
+                m.muted = !m.muted;
+            });
+            document.getElementById('metronome-manual').addEventListener('click', function() {
+                metronome.running = !metronome.running;
+            });
+            for (const e of document.getElementsByClassName('metronome-speed-diff')) {
+                e.addEventListener('click', function() {
+                    metronome.speed += parseInt(this.getAttribute("data-speed-diff"))
+                });
+            }
         </script>
         <script>
             const beats = {{ beats.beats | tojson }};
